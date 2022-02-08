@@ -1,6 +1,7 @@
 package preprocessor
 
 import (
+	"fmt"
 	"regexp"
 )
 
@@ -9,39 +10,74 @@ func minify(input string) string {
 	return n.ReplaceAllString(input, "")
 }
 
+// TODO: Write comment
 type TokenSpec struct {
 	regExp     string
 	matchIndex int
 	tokenType  TokenType
 }
 
+// TODO: Write comment
 type Token struct {
-	content   string
-	tokenType TokenType
+	Value string    `json:"value,omitempty"`
+	Type  TokenType `json:"type,omitempty"`
+}
+
+// TODO: Write comment
+func (token Token) String() string {
+	return fmt.Sprintf("%s: \"%s\"", token.Type.String(), token.Value)
+}
+
+// TODO: Write comment
+func (token Token) Json() string {
+	return ""
 }
 
 type Tokenizer struct {
-	input  string
-	cursor int
-	spec   []TokenSpec
+	Spec   []TokenSpec // Specification of which Regular Expression returns which type.
+	input  string      // TODO: Write comment
+	cursor int         // TODO: Write comment
 }
 
+// TODO: Write comment
 func (tokenizer *Tokenizer) NextToken() *Token {
 	nextInput := tokenizer.input[tokenizer.cursor:]
 
-	for _, tokenSpec := range tokenizer.spec {
+	for _, tokenSpec := range tokenizer.Spec {
 		matched := regexp.MustCompile(tokenSpec.regExp).FindStringSubmatch(nextInput)
-
 		if matched == nil {
 			continue
 		}
 
-		tokenizer.cursor += len(matched[tokenSpec.matchIndex])
-
-		result := minify(matched[tokenSpec.matchIndex])
-
-		return &Token{result, tokenSpec.tokenType}
+		returnValue := matched[tokenSpec.matchIndex]
+		tokenizer.cursor += len(returnValue)
+		return &Token{minify(returnValue), tokenSpec.tokenType}
 	}
 
 	return nil
+}
+
+// TODO: Write comment
+func (tokenizer *Tokenizer) SetInput(input string) {
+	tokenizer.input = input
+	tokenizer.cursor = 0
+}
+
+// TODO: Write comment
+func (tokenizer Tokenizer) Tokenize(input string) []Token {
+	tokenizer.SetInput(input)
+
+	var tokens []Token
+
+	for tokenizer.cursor < len(input) {
+		nextToken := tokenizer.NextToken()
+
+		if nextToken == nil {
+			break
+		}
+
+		tokens = append(tokens, *nextToken)
+	}
+
+	return tokens
 }

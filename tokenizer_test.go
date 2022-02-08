@@ -106,8 +106,8 @@ const html2 = `<!DOCTYPE html>
   </body>
 </html>`
 
-var tokenizer = Tokenizer{
-	spec: []TokenSpec{
+var testTokenizer = Tokenizer{
+	Spec: []TokenSpec{
 		{
 			regExp:     `^<!--[\s\S]*?(-->)`,
 			matchIndex: 0,
@@ -126,68 +126,26 @@ var tokenizer = Tokenizer{
 	},
 }
 
-func printTokens(tokens []Token) {
-	fmt.Print("[\n")
-	for _, token := range tokens {
-		fmt.Printf("%s: \"%s\",\n", token.tokenType.String(), token.content)
-	}
-	fmt.Print("]\n")
-}
-
 func TestTokenizeHTML(test *testing.T) {
-	tokenizer.input = html
-	tokenizer.cursor = 0
-
-	var tokens []Token
-
-	for tokenizer.cursor < len(tokenizer.input) {
-		nextToken := tokenizer.NextToken()
-
-		if nextToken == nil {
-			break
-		}
-
-		tokens = append(tokens, *nextToken)
+	for i, token := range testTokenizer.Tokenize(html) {
+		fmt.Println(i, token.String())
 	}
-
-	printTokens(tokens)
 }
 
 func TestTokenizeHTML2(test *testing.T) {
-	tokenizer.input = html2
-	tokenizer.cursor = 0
-
-	var tokens []Token
-
-	for tokenizer.cursor < len(tokenizer.input) {
-		nextToken := tokenizer.NextToken()
-
-		if nextToken == nil {
-			break
-		}
-
-		tokens = append(tokens, *nextToken)
+	for i, token := range testTokenizer.Tokenize(html2) {
+		fmt.Println(i, token.String())
 	}
-
-	printTokens(tokens)
 }
 
-// func TestTokenizeEmpty(test *testing.T) {
-// 	tokenizer.input = ""
-// 	tokenizer.cursor = 0
+func TestTokenizeEmpty(test *testing.T) {
+	fmt.Println(testTokenizer.Tokenize(""))
+}
 
-// 	nextToken := tokenizer.NextToken()
-// 	nextToken = tokenizer.NextToken()
-// 	nextToken = tokenizer.NextToken()
-
-// 	fmt.Println(nextToken)
-// }
-
-// Token{
-// 	content: "<!-- <section>{app:{test:{test}}}</section> -->",
-// 	token:   COMMENT,
-// },
-// Token{
-// 	content: "{svg:{ashg}}",
-// 	token:   EXPRESSION,
-// }
+func TestTokenTypeToString(test *testing.T) {
+	if COMMENT.String() != "COMMENT" ||
+		EXPRESSION.String() != "EXPRESSION" ||
+		CONTENT.String() != "CONTENT" {
+		test.Fail()
+	}
+}
