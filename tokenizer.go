@@ -10,33 +10,32 @@ func minify(input string) string {
 	return n.ReplaceAllString(input, "")
 }
 
-// TODO: Write comment
+// Specification for matching a specific Token
 type TokenSpec struct {
 	regExp     string
 	matchIndex int
 	tokenType  TokenType
 }
 
-// TODO: Write comment
 type Token struct {
 	Value string    `json:"value,omitempty"`
 	Type  TokenType `json:"type,omitempty"`
 }
 
-// TODO: Write comment
 func (token Token) String() string {
 	return fmt.Sprintf("%s: \"%s\"", token.Type.String(), token.Value)
 }
 
+// TODO: Use Unmarshal; encoding/json package
 // TODO: Write comment
 func (token Token) Json() string {
 	return ""
 }
 
 type Tokenizer struct {
-	Spec   []TokenSpec // Specification of which Regular Expression returns which type.
-	input  string      // TODO: Write comment
-	cursor int         // TODO: Write comment
+	Spec   []TokenSpec
+	input  string
+	cursor int
 }
 
 // TODO: Write comment
@@ -57,7 +56,6 @@ func (tokenizer *Tokenizer) NextToken() *Token {
 	return nil
 }
 
-// TODO: Write comment
 func (tokenizer *Tokenizer) SetInput(input string) {
 	tokenizer.input = input
 	tokenizer.cursor = 0
